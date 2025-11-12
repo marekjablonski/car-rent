@@ -23,6 +23,7 @@ public class CarType {
     @Id
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
     private CarCategory category;
 
     private String pictureUrl;
@@ -59,25 +60,16 @@ public class CarType {
         this.seats = seats;
     }
 
-    public Set<Car> cars() {
-        return Collections.unmodifiableSet(cars);
-    }
 
     public Set<Reservation> reservations() {
         return Collections.unmodifiableSet(reservations);
     }
 
     public void addCar(Car car) {
-        if (!car.carTypeId().equals(id)) {
-            throw new IllegalArgumentException("Car does not belong to this car type");
-        }
         cars.add(car);
     }
 
     public void addReservation(Reservation reservation) {
-        if (!reservation.carTypeId().equals(id)) {
-            throw new IllegalArgumentException("Reservation does not belong to this car type");
-        }
         reservations.add(reservation);
     }
 

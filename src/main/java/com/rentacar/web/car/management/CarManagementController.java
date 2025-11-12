@@ -16,7 +16,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping
@@ -24,7 +26,6 @@ import java.util.*;
 public class CarManagementController {
 
     private final CarManagement carManagement;
-    private final CarAvailabilityService carAvailabilityService;
 
     @PostMapping("/carType")
     public ResponseEntity<CarTypeResponse> createCarType(@RequestBody @Valid CreateCarTypeRequest request) {
@@ -93,28 +94,6 @@ public class CarManagementController {
                 dto.availableFrom(),
                 Map.of("carType", "/carType/" + dto.carTypeId())
         );
-    }
-
-    private static List<CarCategory> parseCategories(String filter) {
-        if (filter == null || filter.isBlank()) {
-            return List.of();
-        }
-        String trimmed = filter.replace("[", "").replace("]", "");
-        if (trimmed.isBlank()) {
-            return List.of();
-        }
-        EnumSet<CarCategory> results = EnumSet.noneOf(CarCategory.class);
-        for (String token : trimmed.split(",")) {
-            if (token.isBlank()) {
-                continue;
-            }
-            try {
-                results.add(CarCategory.valueOf(token.trim().toUpperCase(Locale.ROOT)));
-            } catch (IllegalArgumentException ex) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown car category: " + token);
-            }
-        }
-        return List.copyOf(results);
     }
 
     private static Map<String, String> carTypeLinks(UUID carTypeId) {

@@ -51,6 +51,11 @@ public class InMemoryCarReservationRepository implements CarReservationRepositor
     }
 
     @Override
+    public Set<CarType> findCarTypesByCategoryAndDates(CarCategory carCategory, LocalDate pickupDate, LocalDate dropOffDate) {
+        return Set.of();
+    }
+
+    @Override
     public Optional<Reservation> findReservation(UUID reservationId) {
         UUID carTypeId = reservationIndex.get(reservationId);
         if (carTypeId == null) {
@@ -90,17 +95,6 @@ public class InMemoryCarReservationRepository implements CarReservationRepositor
         synchronized (carType) {
             return carType.countActiveReservations(range, now);
         }
-    }
-
-    @Override
-    public List<CarType> filterCarTypes(Collection<CarCategory> categories) {
-        if (categories == null || categories.isEmpty()) {
-            return new ArrayList<>(carTypes.values());
-        }
-        return carTypes.values()
-                .stream()
-                .filter(type -> categories.contains(type.category()))
-                .toList();
     }
 
     private CarType getCarTypeOrThrow(UUID id) {
