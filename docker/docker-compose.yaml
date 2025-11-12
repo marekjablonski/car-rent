@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+
+  juggling-api-pgsql:
+    image: postgres:16.1
+    environment:
+      POSTGRES_DB: car_rent
+      POSTGRES_USER: car_rent_app
+      POSTGRES_PASSWORD: car_rent_pass
+    restart: always
+    ports:
+      - 5432:5432
