@@ -52,4 +52,16 @@ public class CarManagementService {
                 saved.availableFrom()
         );
     }
+
+    public CarTypeDto getCarType(UUID carTypeId) {
+        return carCatalogRepository.findCarType(carTypeId)
+                .map(carType -> new CarTypeDto(
+                        carType.id(),
+                        carType.category(),
+                        carType.pictureUrl(),
+                        carType.pricePerDay(),
+                        carType.seats()
+                ))
+                .orElseThrow(() -> new IllegalArgumentException("Car type not found: " + carTypeId));
+    }
 }

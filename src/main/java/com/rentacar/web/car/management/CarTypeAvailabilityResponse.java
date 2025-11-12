@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rentacar.model.CarCategory;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.UUID;
 
 public record CarTypeAvailabilityResponse(
@@ -12,6 +13,7 @@ public record CarTypeAvailabilityResponse(
         String pictureUrl,
         BigDecimal pricePerDay,
         int seats,
-        long availableUnits
+        long availableUnits,
+        @JsonProperty("_links") Map<String, String> links
 ) {
 }

@@ -63,4 +63,10 @@ public class ReservationService {
                 reservation.paymentId()
         );
     }
+
+    public ReservationDto getReservation(UUID reservationId) {
+        return carCatalogRepository.findReservation(reservationId)
+                .map(ReservationService::toDto)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
+    }
 }

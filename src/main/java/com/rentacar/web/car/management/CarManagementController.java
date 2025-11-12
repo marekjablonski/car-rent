@@ -3,18 +3,20 @@ package com.rentacar.web.car.management;
 import com.rentacar.model.CarCategory;
 import com.rentacar.service.car.management.CarAvailabilityService;
 import com.rentacar.service.car.management.CarManagementService;
+import com.rentacar.service.car.management.dto.CarDto;
+import com.rentacar.service.car.management.dto.CarTypeDto;
 import com.rentacar.service.car.management.dto.RegisterCarCommand;
 import com.rentacar.service.car.management.dto.RegisterCarTypeCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.URI;
 import java.time.LocalDate;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @RestController
 @RequestMapping
@@ -25,26 +27,28 @@ public class CarManagementController {
     private final CarAvailabilityService carAvailabilityService;
 
     @PostMapping("/carType")
-    public CarTypeResponse createCarType(@RequestBody CreateCarTypeRequest request) {
+    public ResponseEntity<CarTypeResponse> createCarType(@RequestBody CreateCarTypeRequest request) {
         validateCarTypeRequest(request);
-        var saved = carManagementService.registerCarType(new RegisterCarTypeCommand(
-                request.id(),
-                request.category(),
-                request.pictureUrl(),
-                request.pricePerDay(),
-                request.seats()
-        ));
-        return new CarTypeResponse(
-                saved.id(),
-                saved.category(),
-                saved.pictureUrl(),
-                saved.pricePerDay(),
-                saved.seats()
+        CarTypeResponse body = toCarTypeResponse(
+                carManagementService.registerCarType(new RegisterCarTypeCommand(
+                        request.id(),
+                        request.category(),
+                        request.pictureUrl(),
+                        request.pricePerDay(),
+                        request.seats()
+                ))
         );
+        return ResponseEntity.created(URI.create("/carType/" + body.id())).body(body);
+    }
+
+    @GetMapping("/carType/{carTypeId}")
+    public CarTypeResponse getCarType(@PathVariable UUID carTypeId) {
+        CarTypeDto dto = carManagementService.getCarType(carTypeId);
+        return toCarTypeResponse(dto);
     }
 
     @PostMapping("/car")
-    public CarResponse registerCar(@RequestBody CreateCarRequest request) {
+    public ResponseEntity<CarResponse> registerCar(@RequestBody CreateCarRequest request) {
         if (request.carTypeId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "carTypeId is required");
         }
@@ -54,12 +58,12 @@ public class CarManagementController {
         if (request.availableFrom() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "availableFrom is required");
         }
-        var saved = carManagementService.registerCar(new RegisterCarCommand(
+        CarResponse body = toCarResponse(carManagementService.registerCar(new RegisterCarCommand(
                 request.carTypeId(),
                 request.numberPlate(),
                 request.availableFrom()
-        ));
-        return new CarResponse(saved.id(), saved.carTypeId(), saved.numberPlate(), saved.availableFrom());
+        )));
+        return ResponseEntity.created(URI.create("/car/" + body.id())).body(body);
     }
 
     @GetMapping("/carType")
@@ -80,9 +84,31 @@ public class CarManagementController {
                         availability.pictureUrl(),
                         availability.pricePerDay(),
                         availability.seats(),
-                        availability.availableUnits()
+                        availability.availableUnits(),
+                        carTypeLinks(availability.id())
                 ))
                 .toList();
+    }
+
+    private static CarTypeResponse toCarTypeResponse(CarTypeDto dto) {
+        return new CarTypeResponse(
+                dto.id(),
+                dto.category(),
+                dto.pictureUrl(),
+                dto.pricePerDay(),
+                dto.seats(),
+                carTypeLinks(dto.id())
+        );
+    }
+
+    private static CarResponse toCarResponse(CarDto dto) {
+        return new CarResponse(
+                dto.id(),
+                dto.carTypeId(),
+                dto.numberPlate(),
+                dto.availableFrom(),
+                Map.of("carType", "/carType/" + dto.carTypeId())
+        );
     }
 
     private static void validateCarTypeRequest(CreateCarTypeRequest request) {
@@ -123,5 +149,12 @@ public class CarManagementController {
             }
         }
         return List.copyOf(results);
+    }
+
+    private static Map<String, String> carTypeLinks(UUID carTypeId) {
+        return Map.of(
+                "self", "/carType/" + carTypeId,
+                "reserve", "/reservation"
+        );
     }
 }
