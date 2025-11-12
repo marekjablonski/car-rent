@@ -1,6 +1,7 @@
 package com.rentacar.repo;
 
 import com.rentacar.model.*;
+import com.rentacar.service.car.management.CarManagementRepository;
 import com.rentacar.service.car.reservation.CarReservationRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +11,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class InMemoryCarReservationRepository implements CarReservationRepository {
+public class InMemoryCarReservationRepository implements CarReservationRepository, CarManagementRepository {
 
     private final Map<UUID, CarType> carTypes = new ConcurrentHashMap<>();
     private final Map<CarCategory, UUID> typePerCategory = new ConcurrentHashMap<>();
@@ -89,11 +90,6 @@ public class InMemoryCarReservationRepository implements CarReservationRepositor
         synchronized (carType) {
             return carType.countActiveReservations(range, now);
         }
-    }
-
-    @Override
-    public List<CarType> listCarTypes() {
-        return new ArrayList<>(carTypes.values());
     }
 
     @Override
