@@ -1,6 +1,7 @@
 package com.rentacar.service.car.management;
 
 import com.rentacar.model.Car;
+import com.rentacar.model.CarCategory;
 import com.rentacar.model.CarType;
 import com.rentacar.service.car.management.dto.CarDto;
 import com.rentacar.service.car.management.dto.CarTypeDto;
@@ -9,6 +10,8 @@ import com.rentacar.service.car.management.dto.RegisterCarTypeCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -33,18 +36,21 @@ class CarManagementImpl implements CarManagement {
 
     @Override
     public CarDto registerCar(RegisterCarCommand command) {
+
+        CarType type = carManagementRepository.findCarType(command.carTypeId()).get();
         Car car = new Car(
                 UUID.randomUUID(),
-                command.carTypeId(),
+                type,
                 command.numberPlate().toUpperCase(Locale.ROOT),
                 command.availableFrom()
         );
-        Car saved = carManagementRepository.registerCar(command.carTypeId(), car);
+        type.addCar(car);
+
         return new CarDto(
-                saved.id(),
-                saved.carTypeId(),
-                saved.numberPlate(),
-                saved.availableFrom()
+                car.id(),
+                car.carType().id(),
+                car.numberPlate(),
+                car.availableFrom()
         );
     }
 
@@ -53,6 +59,14 @@ class CarManagementImpl implements CarManagement {
         return carManagementRepository.findCarType(carTypeId)
                 .map(CarManagementImpl::toCarTypeDto)
                 .orElseThrow(() -> new IllegalArgumentException("Car type not found: " + carTypeId));
+    }
+
+    @Override
+    public List<CarTypeDto> getAvailableCarTypesByCategoryAndDates(CarCategory carCategory, LocalDate pickupDate, LocalDate dropOffDate) {
+        return carManagementRepository.findCarTypesByCategoryAndDates(carCategory, pickupDate, dropOffDate)
+                .stream()
+                .map(CarManagementImpl::toCarTypeDto)
+                .toList();
     }
 
     private static CarTypeDto toCarTypeDto(CarType carType) {

@@ -4,7 +4,7 @@ import com.rentacar.model.CarCategory;
 import com.rentacar.service.car.management.CarManagement;
 import com.rentacar.service.car.management.dto.RegisterCarCommand;
 import com.rentacar.service.car.management.dto.RegisterCarTypeCommand;
-import com.rentacar.service.car.reservation.CarAvailability;
+import com.rentacar.service.car.reservation.CarAvailabilityService;
 import com.rentacar.service.car.reservation.CreateReservationCommand;
 import com.rentacar.service.car.reservation.ReservationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +19,6 @@ import java.time.*;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
@@ -30,14 +29,14 @@ class CarRentApplicationTests {
 
     private final ReservationService reservationService;
     private final CarManagement carManagement;
-    private final CarAvailability carAvailability;
+    private final CarAvailabilityService carAvailability;
     private final MutableClock clock;
 
     private UUID carTypeId;
 
     CarRentApplicationTests(ReservationService reservationService,
                             CarManagement carManagement,
-                            CarAvailability carAvailability,
+                            CarAvailabilityService carAvailability,
                             MutableClock clock) {
         this.reservationService = reservationService;
         this.carManagement = carManagement;

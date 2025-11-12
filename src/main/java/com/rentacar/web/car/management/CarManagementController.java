@@ -24,6 +24,7 @@ import java.util.*;
 public class CarManagementController {
 
     private final CarManagement carManagement;
+    private final CarAvailabilityService carAvailabilityService;
 
     @PostMapping("/carType")
     public ResponseEntity<CarTypeResponse> createCarType(@RequestBody @Valid CreateCarTypeRequest request) {
@@ -45,6 +46,21 @@ public class CarManagementController {
         return toCarTypeResponse(dto);
     }
 
+    @GetMapping("/carType")
+    public List<CarTypeResponse> getAvailableCarTypes(
+            @RequestParam(name = "type", required = false) CarCategory carCategory,
+            @RequestParam(name = "pickup-date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate pickupDate,
+            @RequestParam(name = "drop-off-date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dropOffDate
+    ) {
+        if (dropOffDate.isBefore(pickupDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "drop-off-date must be after pickup-date");
+        }
+        return carManagement.getAvailableCarTypesByCategoryAndDates(carCategory, pickupDate, dropOffDate)
+                .stream()
+                .map(CarManagementController::toCarTypeResponse)
+                .toList();
+    }
+
     @PostMapping("/carType/{carTypeId}/car")
     public ResponseEntity<CarResponse> registerCar(@PathVariable(required = false) UUID carTypeId,
                                                    @RequestBody @Valid CreateCarRequest request) {
@@ -57,29 +73,6 @@ public class CarManagementController {
         return ResponseEntity.created(URI.create("/car/" + body.id())).body(body);
     }
 
-    @GetMapping("/carType")
-    public List<CarTypeAvailabilityResponse> getAvailableCarTypes(
-            @RequestParam(name = "type", required = false) String typeFilter,
-            @RequestParam(name = "pickup-date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate pickupDate,
-            @RequestParam(name = "drop-off-date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dropOffDate
-    ) {
-        if (dropOffDate.isBefore(pickupDate)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "drop-off-date must be after pickup-date");
-        }
-        List<CarCategory> categories = parseCategories(typeFilter);
-        return carAvailabilityService.findAvailableTypes(categories, pickupDate, dropOffDate)
-                .stream()
-                .map(availability -> new CarTypeAvailabilityResponse(
-                        availability.id(),
-                        availability.category(),
-                        availability.pictureUrl(),
-                        availability.pricePerDay(),
-                        availability.seats(),
-                        availability.availableUnits(),
-                        carTypeLinks(availability.id())
-                ))
-                .toList();
-    }
 
     private static CarTypeResponse toCarTypeResponse(CarTypeDto dto) {
         return new CarTypeResponse(
