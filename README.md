@@ -51,7 +51,7 @@ com.rentacar
 POST /carType
 {
   "id": "uuid",
-  "type": "Sedan",
+  "category": "Sedan",
   "pictureUrl": "https://not.exist/car/photos/200/300",
   "pricePerDay": 100,
   "seats": 5

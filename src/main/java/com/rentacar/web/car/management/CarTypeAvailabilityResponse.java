@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public record CarTypeAvailabilityResponse(
         UUID id,
-        @JsonProperty("type") CarCategory category,
+        CarCategory category,
         String pictureUrl,
         BigDecimal pricePerDay,
         int seats,
