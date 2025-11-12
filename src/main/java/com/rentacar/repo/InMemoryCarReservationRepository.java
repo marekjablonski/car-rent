@@ -1,6 +1,9 @@
 package com.rentacar.repo;
 
-import com.rentacar.model.*;
+import com.rentacar.model.CarCategory;
+import com.rentacar.model.CarType;
+import com.rentacar.model.DateRange;
+import com.rentacar.model.Reservation;
 import com.rentacar.service.car.management.CarManagementRepository;
 import com.rentacar.service.car.reservation.CarReservationRepository;
 import org.springframework.stereotype.Repository;
@@ -32,18 +35,6 @@ public class InMemoryCarReservationRepository implements CarReservationRepositor
         return carType;
     }
 
-    @Override
-    public Car registerCar(UUID carTypeId, Car car) {
-        CarType carType = getCarTypeOrThrow(carTypeId);
-        UUID previousPlate = plateIndex.putIfAbsent(car.numberPlate(), car.id());
-        if (previousPlate != null) {
-            throw new IllegalArgumentException("Number plate already registered: " + car.numberPlate());
-        }
-        synchronized (carType) {
-            carType.addCar(car);
-        }
-        return car;
-    }
 
     @Override
     public Optional<CarType> findCarType(UUID id) {

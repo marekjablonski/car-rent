@@ -1,5 +1,6 @@
 package com.rentacar.service.car.reservation;
 
+import com.rentacar.model.CarType;
 import com.rentacar.model.Reservation;
 import com.rentacar.service.car.reservation.dto.ReservationDto;
 import com.rentacar.service.car.reservation.validation.ReservationValidationChain;
@@ -24,12 +25,14 @@ class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationDto createReservation(CreateReservationCommand command) {
+        CarType carType = carReservationRepository.findCarType(command.carTypeId()).get();
+
         reservationValidationChain.validate(command);
         Instant now = clock.instant();
         Reservation reservation = new Reservation(
                 command.reservationId(),
                 command.userId(),
-                command.carTypeId(),
+                carType,
                 command.dateFrom(),
                 command.dateTo(),
                 now,
@@ -63,7 +66,7 @@ class ReservationServiceImpl implements ReservationService {
         return new ReservationDto(
                 reservation.id(),
                 reservation.userId(),
-                reservation.carTypeId(),
+                reservation.carType().id(),
                 reservation.dateRange().start(),
                 reservation.dateRange().end(),
                 reservation.status(),
