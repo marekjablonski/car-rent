@@ -18,7 +18,7 @@ import java.util.UUID;
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-class Car {
+public class Car {
     @Id
     @EqualsAndHashCode.Include
     @ToString.Include
@@ -29,7 +29,7 @@ class Car {
     private final String numberPlate;
     private final LocalDate availableFrom;
 
-    Car(UUID id, CarType carType, String numberPlate, LocalDate availableFrom) {
+    public Car(UUID id, CarType carType, String numberPlate, LocalDate availableFrom) {
         this.id = Objects.requireNonNull(id, "id is required");
         this.carType = Objects.requireNonNull(carType, "carTypeId is required");
         this.numberPlate = Objects.requireNonNull(numberPlate, "numberPlate is required");

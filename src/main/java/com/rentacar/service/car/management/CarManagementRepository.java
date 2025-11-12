@@ -1,0 +1,17 @@
+package com.rentacar.service.car.management;
+
+import com.rentacar.model.Car;
+import com.rentacar.model.CarType;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public interface CarManagementRepository {
+
+    CarType saveCarType(CarType carType);
+
+    Car registerCar(UUID carTypeId, Car car);
+
+    Optional<CarType> findCarType(UUID id);
+
+}

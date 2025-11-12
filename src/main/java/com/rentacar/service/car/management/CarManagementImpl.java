@@ -2,7 +2,6 @@ package com.rentacar.service.car.management;
 
 import com.rentacar.model.Car;
 import com.rentacar.model.CarType;
-import com.rentacar.repo.CarCatalogRepository;
 import com.rentacar.service.car.management.dto.CarDto;
 import com.rentacar.service.car.management.dto.CarTypeDto;
 import com.rentacar.service.car.management.dto.RegisterCarCommand;
@@ -15,9 +14,9 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-class CarManagementServiceImpl implements CarManagementService {
+class CarManagementImpl implements CarManagement {
 
-    private final CarCatalogRepository carCatalogRepository;
+    private final CarManagementRepository carManagementRepository;
 
     @Override
     public CarTypeDto registerCarType(RegisterCarTypeCommand command) {
@@ -28,7 +27,7 @@ class CarManagementServiceImpl implements CarManagementService {
                 command.pricePerDay(),
                 command.seats()
         );
-        CarType saved = carCatalogRepository.saveCarType(carType);
+        CarType saved = carManagementRepository.saveCarType(carType);
         return toCarTypeDto(saved);
     }
 
@@ -40,7 +39,7 @@ class CarManagementServiceImpl implements CarManagementService {
                 command.numberPlate().toUpperCase(Locale.ROOT),
                 command.availableFrom()
         );
-        Car saved = carCatalogRepository.registerCar(command.carTypeId(), car);
+        Car saved = carManagementRepository.registerCar(command.carTypeId(), car);
         return new CarDto(
                 saved.id(),
                 saved.carTypeId(),
@@ -51,8 +50,8 @@ class CarManagementServiceImpl implements CarManagementService {
 
     @Override
     public CarTypeDto getCarType(UUID carTypeId) {
-        return carCatalogRepository.findCarType(carTypeId)
-                .map(CarManagementServiceImpl::toCarTypeDto)
+        return carManagementRepository.findCarType(carTypeId)
+                .map(CarManagementImpl::toCarTypeDto)
                 .orElseThrow(() -> new IllegalArgumentException("Car type not found: " + carTypeId));
     }
 

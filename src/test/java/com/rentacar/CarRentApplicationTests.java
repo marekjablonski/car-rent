@@ -1,10 +1,10 @@
 package com.rentacar;
 
 import com.rentacar.model.CarCategory;
-import com.rentacar.service.car.management.CarAvailabilityService;
-import com.rentacar.service.car.management.CarManagementService;
+import com.rentacar.service.car.management.CarManagement;
 import com.rentacar.service.car.management.dto.RegisterCarCommand;
 import com.rentacar.service.car.management.dto.RegisterCarTypeCommand;
+import com.rentacar.service.car.reservation.CarAvailability;
 import com.rentacar.service.car.reservation.CreateReservationCommand;
 import com.rentacar.service.car.reservation.ReservationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,33 +29,33 @@ class CarRentApplicationTests {
     private static final ZoneId UTC = ZoneId.of("UTC");
 
     private final ReservationService reservationService;
-    private final CarManagementService carManagementService;
-    private final CarAvailabilityService carAvailabilityService;
+    private final CarManagement carManagement;
+    private final CarAvailability carAvailability;
     private final MutableClock clock;
 
     private UUID carTypeId;
 
     CarRentApplicationTests(ReservationService reservationService,
-                            CarManagementService carManagementService,
-                            CarAvailabilityService carAvailabilityService,
+                            CarManagement carManagement,
+                            CarAvailability carAvailability,
                             MutableClock clock) {
         this.reservationService = reservationService;
-        this.carManagementService = carManagementService;
-        this.carAvailabilityService = carAvailabilityService;
+        this.carManagement = carManagement;
+        this.carAvailability = carAvailability;
         this.clock = clock;
     }
 
     @BeforeEach
     void setUpFleet() {
         carTypeId = UUID.randomUUID();
-        carManagementService.registerCarType(new RegisterCarTypeCommand(
+        carManagement.registerCarType(new RegisterCarTypeCommand(
                 carTypeId,
                 CarCategory.SEDAN,
                 "https://example.com/sedan.png",
                 BigDecimal.valueOf(100),
                 5
         ));
-        carManagementService.registerCar(new RegisterCarCommand(carTypeId, "ABC123", currentDate()));
+        carManagement.registerCar(new RegisterCarCommand(carTypeId, "ABC123", currentDate()));
     }
 
     @Test
@@ -72,7 +72,7 @@ class CarRentApplicationTests {
                 dropOff
         ));
 
-        var available = carAvailabilityService.findAvailableTypes(List.of(CarCategory.SEDAN), pickup, dropOff);
+        var available = carAvailability.findAvailableTypes(List.of(CarCategory.SEDAN), pickup, dropOff);
         assertThat(available).isEmpty();
     }
 

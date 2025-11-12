@@ -1,9 +1,8 @@
-package com.rentacar.service.car.management;
+package com.rentacar.service.car.reservation;
 
 import com.rentacar.model.CarCategory;
 import com.rentacar.model.CarType;
 import com.rentacar.model.DateRange;
-import com.rentacar.repo.CarCatalogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +15,9 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class CarAvailabilityService {
+public class CarAvailability {
 
-    private final CarCatalogRepository carCatalogRepository;
+    private final CarReservationRepository carReservationRepository;
     private final Clock clock;
 
     public List<CarTypeAvailability> findAvailableTypes(Collection<CarCategory> categories,
@@ -26,7 +25,7 @@ public class CarAvailabilityService {
                                                         LocalDate dropOffDate) {
         DateRange requestedRange = new DateRange(pickupDate, dropOffDate);
         Instant now = clock.instant();
-        return carCatalogRepository.filterCarTypes(categories)
+        return carReservationRepository.filterCarTypes(categories)
                 .stream()
                 .map(carType -> toAvailability(carType, requestedRange, pickupDate, now))
                 .filter(availability -> availability.availableUnits() > 0)
@@ -34,8 +33,8 @@ public class CarAvailabilityService {
     }
 
     private CarTypeAvailability toAvailability(CarType carType, DateRange range, LocalDate pickupDate, Instant now) {
-        long total = carCatalogRepository.countCarsAvailableFrom(carType.id(), pickupDate);
-        long reserved = carCatalogRepository.countActiveReservations(carType.id(), range, now);
+        long total = carReservationRepository.countCarsAvailableFrom(carType.id(), pickupDate);
+        long reserved = carReservationRepository.countActiveReservations(carType.id(), range, now);
         long available = Math.max(total - reserved, 0);
         return new CarTypeAvailability(
                 carType.id(),

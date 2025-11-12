@@ -7,7 +7,7 @@ import com.rentacar.service.car.management.dto.RegisterCarTypeCommand;
 
 import java.util.UUID;
 
-public interface CarManagementService {
+public interface CarManagement {
 
     CarTypeDto registerCarType(RegisterCarTypeCommand command);
 

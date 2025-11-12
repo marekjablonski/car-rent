@@ -1,14 +1,14 @@
 package com.rentacar.service.car.reservation.validation;
 
-import com.rentacar.repo.CarCatalogRepository;
+import com.rentacar.service.car.reservation.CarReservationRepository;
 import com.rentacar.service.car.reservation.CreateReservationCommand;
 
 class CarTypeExistsValidator extends ReservationValidator {
 
-    private final CarCatalogRepository carCatalogRepository;
+    private final CarReservationRepository carReservationRepository;
 
-    CarTypeExistsValidator(CarCatalogRepository carCatalogRepository) {
-        this.carCatalogRepository = carCatalogRepository;
+    CarTypeExistsValidator(CarReservationRepository carReservationRepository) {
+        this.carReservationRepository = carReservationRepository;
     }
 
     @Override
@@ -16,7 +16,7 @@ class CarTypeExistsValidator extends ReservationValidator {
         if (command.carTypeId() == null) {
             throw new IllegalArgumentException("carTypeId must be provided");
         }
-        carCatalogRepository.findCarType(command.carTypeId())
+        carReservationRepository.findCarType(command.carTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Unknown car type: " + command.carTypeId()));
     }
 }

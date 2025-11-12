@@ -1,8 +1,7 @@
 package com.rentacar.web.car.management;
 
 import com.rentacar.model.CarCategory;
-import com.rentacar.service.car.management.CarAvailabilityService;
-import com.rentacar.service.car.management.CarManagementService;
+import com.rentacar.service.car.management.CarManagement;
 import com.rentacar.service.car.management.dto.CarDto;
 import com.rentacar.service.car.management.dto.CarTypeDto;
 import com.rentacar.service.car.management.dto.RegisterCarCommand;
@@ -24,13 +23,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CarManagementController {
 
-    private final CarManagementService carManagementService;
-    private final CarAvailabilityService carAvailabilityService;
+    private final CarManagement carManagement;
 
     @PostMapping("/carType")
     public ResponseEntity<CarTypeResponse> createCarType(@RequestBody @Valid CreateCarTypeRequest request) {
         CarTypeResponse body = toCarTypeResponse(
-                carManagementService.registerCarType(new RegisterCarTypeCommand(
+                carManagement.registerCarType(new RegisterCarTypeCommand(
                         request.id(),
                         request.category(),
                         request.pictureUrl(),
@@ -43,7 +41,7 @@ public class CarManagementController {
 
     @GetMapping("/carType/{carTypeId}")
     public CarTypeResponse getCarType(@PathVariable UUID carTypeId) {
-        CarTypeDto dto = carManagementService.getCarType(carTypeId);
+        CarTypeDto dto = carManagement.getCarType(carTypeId);
         return toCarTypeResponse(dto);
     }
 
@@ -51,7 +49,7 @@ public class CarManagementController {
     public ResponseEntity<CarResponse> registerCar(@PathVariable(required = false) UUID carTypeId,
                                                    @RequestBody @Valid CreateCarRequest request) {
 
-        CarResponse body = toCarResponse(carManagementService.registerCar(new RegisterCarCommand(
+        CarResponse body = toCarResponse(carManagement.registerCar(new RegisterCarCommand(
                 carTypeId,
                 request.numberPlate(),
                 request.availableFrom()

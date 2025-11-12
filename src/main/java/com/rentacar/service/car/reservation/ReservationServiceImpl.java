@@ -1,7 +1,6 @@
 package com.rentacar.service.car.reservation;
 
 import com.rentacar.model.Reservation;
-import com.rentacar.repo.CarCatalogRepository;
 import com.rentacar.service.car.reservation.dto.ReservationDto;
 import com.rentacar.service.car.reservation.validation.ReservationValidationChain;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ class ReservationServiceImpl implements ReservationService {
     static final Duration LOCK_DURATION = Duration.ofMinutes(10);
     static final Duration PAYMENT_GRACE = Duration.ofMinutes(2);
 
-    private final CarCatalogRepository carCatalogRepository;
+    private final CarReservationRepository carReservationRepository;
     private final ReservationValidationChain reservationValidationChain;
     private final Clock clock;
 
@@ -36,13 +35,13 @@ class ReservationServiceImpl implements ReservationService {
                 now,
                 now.plus(LOCK_DURATION)
         );
-        Reservation saved = carCatalogRepository.saveReservation(command.carTypeId(), reservation);
+        Reservation saved = carReservationRepository.saveReservation(command.carTypeId(), reservation);
         return toDto(saved);
     }
 
     @Override
     public ReservationDto confirmPayment(UUID reservationId, String paymentId) {
-        Reservation reservation = carCatalogRepository.findReservation(reservationId)
+        Reservation reservation = carReservationRepository.findReservation(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
         Instant now = clock.instant();
         Instant paymentDeadline = reservation.lockExpiresAt().plus(PAYMENT_GRACE);
@@ -55,7 +54,7 @@ class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationDto getReservation(UUID reservationId) {
-        return carCatalogRepository.findReservation(reservationId)
+        return carReservationRepository.findReservation(reservationId)
                 .map(ReservationServiceImpl::toDto)
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
     }

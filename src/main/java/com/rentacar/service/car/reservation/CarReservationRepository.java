@@ -1,6 +1,9 @@
-package com.rentacar.repo;
+package com.rentacar.service.car.reservation;
 
-import com.rentacar.model.*;
+import com.rentacar.model.CarCategory;
+import com.rentacar.model.CarType;
+import com.rentacar.model.DateRange;
+import com.rentacar.model.Reservation;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -9,11 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface CarCatalogRepository {
-
-    CarType saveCarType(CarType carType);
-
-    Car registerCar(UUID carTypeId, Car car);
+public interface CarReservationRepository {
 
     Optional<CarType> findCarType(UUID id);
 
@@ -24,8 +23,6 @@ public interface CarCatalogRepository {
     long countCarsAvailableFrom(UUID carTypeId, LocalDate pickupDate);
 
     long countActiveReservations(UUID carTypeId, DateRange range, Instant now);
-
-    List<CarType> listCarTypes();
 
     List<CarType> filterCarTypes(Collection<CarCategory> categories);
 }
