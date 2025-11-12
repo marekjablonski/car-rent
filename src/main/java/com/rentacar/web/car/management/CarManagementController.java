@@ -7,6 +7,7 @@ import com.rentacar.service.car.management.dto.CarDto;
 import com.rentacar.service.car.management.dto.CarTypeDto;
 import com.rentacar.service.car.management.dto.RegisterCarCommand;
 import com.rentacar.service.car.management.dto.RegisterCarTypeCommand;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -27,8 +28,7 @@ public class CarManagementController {
     private final CarAvailabilityService carAvailabilityService;
 
     @PostMapping("/carType")
-    public ResponseEntity<CarTypeResponse> createCarType(@RequestBody CreateCarTypeRequest request) {
-        validateCarTypeRequest(request);
+    public ResponseEntity<CarTypeResponse> createCarType(@RequestBody @Valid CreateCarTypeRequest request) {
         CarTypeResponse body = toCarTypeResponse(
                 carManagementService.registerCarType(new RegisterCarTypeCommand(
                         request.id(),
@@ -47,19 +47,12 @@ public class CarManagementController {
         return toCarTypeResponse(dto);
     }
 
-    @PostMapping("/car")
-    public ResponseEntity<CarResponse> registerCar(@RequestBody CreateCarRequest request) {
-        if (request.carTypeId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "carTypeId is required");
-        }
-        if (request.numberPlate() == null || request.numberPlate().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "numberPlate is required");
-        }
-        if (request.availableFrom() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "availableFrom is required");
-        }
+    @PostMapping("/carType/{carTypeId}/car")
+    public ResponseEntity<CarResponse> registerCar(@PathVariable(required = false) UUID carTypeId,
+                                                   @RequestBody @Valid CreateCarRequest request) {
+
         CarResponse body = toCarResponse(carManagementService.registerCar(new RegisterCarCommand(
-                request.carTypeId(),
+                carTypeId,
                 request.numberPlate(),
                 request.availableFrom()
         )));
@@ -109,24 +102,6 @@ public class CarManagementController {
                 dto.availableFrom(),
                 Map.of("carType", "/carType/" + dto.carTypeId())
         );
-    }
-
-    private static void validateCarTypeRequest(CreateCarTypeRequest request) {
-        if (request.id() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id is required");
-        }
-        if (request.category() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "type is required");
-        }
-        if (request.pictureUrl() == null || request.pictureUrl().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "pictureUrl is required");
-        }
-        if (request.pricePerDay() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "pricePerDay is required");
-        }
-        if (request.seats() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "seats must be positive");
-        }
     }
 
     private static List<CarCategory> parseCategories(String filter) {
