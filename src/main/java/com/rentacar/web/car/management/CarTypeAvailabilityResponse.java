@@ -1,7 +1,7 @@
 package com.rentacar.web.car.management;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.rentacar.model.car.CarCategory;
+import com.rentacar.model.CarCategory;
 
 import java.math.BigDecimal;
 import java.util.UUID;

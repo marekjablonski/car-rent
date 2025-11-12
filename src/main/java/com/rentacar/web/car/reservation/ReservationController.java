@@ -1,9 +1,8 @@
 package com.rentacar.web.car.reservation;
 
-import com.rentacar.model.reservation.Reservation;
 import com.rentacar.service.car.reservation.CreateReservationCommand;
 import com.rentacar.service.car.reservation.ReservationService;
-
+import com.rentacar.service.car.reservation.dto.ReservationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +28,7 @@ public class ReservationController {
                 request.dateFrom(),
                 request.dateTo()
         );
-        Reservation reservation = reservationService.createReservation(command);
+        ReservationDto reservation = reservationService.createReservation(command);
         return toResponse(reservation);
     }
 
@@ -41,17 +40,17 @@ public class ReservationController {
         if (request.paymentId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paymentId is required");
         }
-        Reservation reservation = reservationService.confirmPayment(request.reservationId(), request.paymentId().toString());
+        ReservationDto reservation = reservationService.confirmPayment(request.reservationId(), request.paymentId().toString());
         return toResponse(reservation);
     }
 
-    private static ReservationResponse toResponse(Reservation reservation) {
+    private static ReservationResponse toResponse(ReservationDto reservation) {
         return new ReservationResponse(
-                reservation.id(),
+                reservation.reservationId(),
                 reservation.userId(),
                 reservation.carTypeId(),
-                reservation.dateRange().start(),
-                reservation.dateRange().end(),
+                reservation.dateFrom(),
+                reservation.dateTo(),
                 reservation.status(),
                 reservation.lockExpiresAt(),
                 reservation.paymentId()

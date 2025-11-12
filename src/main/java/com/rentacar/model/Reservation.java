@@ -1,6 +1,4 @@
-package com.rentacar.model.reservation;
-
-import com.rentacar.model.common.DateRange;
+package com.rentacar.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

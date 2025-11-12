@@ -1,9 +1,9 @@
 package com.rentacar.service.car.reservation;
 
+import com.rentacar.model.Reservation;
 import com.rentacar.repo.CarCatalogRepository;
-import com.rentacar.model.reservation.Reservation;
+import com.rentacar.service.car.reservation.dto.ReservationDto;
 import com.rentacar.service.car.reservation.validation.ReservationValidationChain;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class ReservationService {
     private final ReservationValidationChain reservationValidationChain;
     private final Clock clock;
 
-    public Reservation createReservation(CreateReservationCommand command) {
+    public ReservationDto createReservation(CreateReservationCommand command) {
         reservationValidationChain.validate(command);
         Instant now = clock.instant();
         Reservation reservation = new Reservation(
@@ -35,10 +35,11 @@ public class ReservationService {
                 now,
                 now.plus(LOCK_DURATION)
         );
-        return carCatalogRepository.saveReservation(command.carTypeId(), reservation);
+        Reservation saved = carCatalogRepository.saveReservation(command.carTypeId(), reservation);
+        return toDto(saved);
     }
 
-    public Reservation confirmPayment(UUID reservationId, String paymentId) {
+    public ReservationDto confirmPayment(UUID reservationId, String paymentId) {
         Reservation reservation = carCatalogRepository.findReservation(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
         Instant now = clock.instant();
@@ -47,6 +48,19 @@ public class ReservationService {
             throw new IllegalStateException("Payment window expired for reservation: " + reservationId);
         }
         reservation.confirm(paymentId, now);
-        return reservation;
+        return toDto(reservation);
+    }
+
+    private static ReservationDto toDto(Reservation reservation) {
+        return new ReservationDto(
+                reservation.id(),
+                reservation.userId(),
+                reservation.carTypeId(),
+                reservation.dateRange().start(),
+                reservation.dateRange().end(),
+                reservation.status(),
+                reservation.lockExpiresAt(),
+                reservation.paymentId()
+        );
     }
 }

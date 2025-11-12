@@ -1,10 +1,9 @@
 package com.rentacar.service.car.management;
 
-import com.rentacar.model.car.CarCategory;
-import com.rentacar.model.car.CarType;
-import com.rentacar.model.common.DateRange;
+import com.rentacar.model.CarCategory;
+import com.rentacar.model.CarType;
+import com.rentacar.model.DateRange;
 import com.rentacar.repo.CarCatalogRepository;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

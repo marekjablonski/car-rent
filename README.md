@@ -28,16 +28,22 @@ creating cars, listing available car types, and booking reservations that span w
   within the lock window.
 
 ## Application Layers
-Layered MVC Architecture is more suitable for CRUD applications
+
+Layered MVC is used throughout the codebase; packages under `com.rentacar` map 1:1 to the responsibilities described
+below:
+
+```
 com.rentacar
-├─ web/                # controllers, request/response DTOs   
-│   ├─ car.management  # creates carType and car   
-│   ├─ car.reservation # car reservation  
-├─ service/            # business logic (uses entities)    
-│   ├─ car.management  # creates carType and car  
-│   ├─ car.reservation # car reservation  
-├─ repo/               # repos   
-└─ model/              # models and mappers (entity <-> DTO)  
+├─ config/                  # shared configuration (clock bean, exception handler)
+├─ model/                   # domain model and mappers
+├─ repo/                    # persistence abstractions + in-memory implementation
+├─ service/                 # business logic (uses model + repos)
+│   ├─ car.management/      # manage car types and vehicles, availability calculations
+│   └─ car.reservation/     # reservation workflows + validation chain
+└─ web/                     # REST controllers, DTOs, and request-validation logic
+    ├─ car.management/      # `/carType`, `/car` endpoints
+    └─ car.reservation/     # `/reservation`, `/payment` endpoints
+```
 
 ## API Contract
 
@@ -50,13 +56,15 @@ POST /carType
   "pricePerDay": 100,
   "seats": 5
 }
+Response: 201 Created
 
-POST /car
+
+POST /carType/{id}/car
 {
-  "carTypeId": "uuid",
   "numberPlate": "ABC123",
   "availableFrom": "2026-01-01"
 }
+Response: 201 Created
 
 GET /carType?type=[Sedan,SUV]&pickup-date=2025-11-15&drop-off-date=2025-11-22
 [
@@ -68,20 +76,26 @@ GET /carType?type=[Sedan,SUV]&pickup-date=2025-11-15&drop-off-date=2025-11-22
   }
 ]
 
-POST /reservation
+Response: 200 OK
+
+POST  /carType/{id}/reservation  
 {
-  "reservationId": "uuid",
   "userId": "uuid",
   "carTypeId": "uuid",
   "dateFrom": "2026-01-01",
   "dateTo": "2026-01-03"
 }
+Response: 201 Created
+Response: 409 Conflict
 
-POST /payment
+PUT /paymentCompletio
 {
   "reservationId": "uuid",
   "paymentId": "uuid"
 }
+
+Response: 201 Created
+
 ```
 
 ## Running Locally

@@ -1,6 +1,6 @@
 package com.rentacar.service.car.reservation.validation;
 
-import com.rentacar.model.common.DateRange;
+import com.rentacar.model.DateRange;
 import com.rentacar.repo.CarCatalogRepository;
 import com.rentacar.service.car.reservation.CreateReservationCommand;
 

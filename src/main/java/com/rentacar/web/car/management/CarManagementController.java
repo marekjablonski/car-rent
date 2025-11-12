@@ -1,19 +1,14 @@
 package com.rentacar.web.car.management;
 
-import com.rentacar.model.car.CarCategory;
-import com.rentacar.model.car.CarType;
+import com.rentacar.model.CarCategory;
 import com.rentacar.service.car.management.CarAvailabilityService;
 import com.rentacar.service.car.management.CarManagementService;
-
+import com.rentacar.service.car.management.dto.RegisterCarCommand;
+import com.rentacar.service.car.management.dto.RegisterCarTypeCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -32,14 +27,13 @@ public class CarManagementController {
     @PostMapping("/carType")
     public CarTypeResponse createCarType(@RequestBody CreateCarTypeRequest request) {
         validateCarTypeRequest(request);
-        CarType carType = new CarType(
+        var saved = carManagementService.registerCarType(new RegisterCarTypeCommand(
                 request.id(),
                 request.category(),
                 request.pictureUrl(),
                 request.pricePerDay(),
                 request.seats()
-        );
-        CarType saved = carManagementService.registerCarType(carType);
+        ));
         return new CarTypeResponse(
                 saved.id(),
                 saved.category(),
@@ -60,7 +54,11 @@ public class CarManagementController {
         if (request.availableFrom() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "availableFrom is required");
         }
-        var saved = carManagementService.registerCar(request.carTypeId(), request.numberPlate(), request.availableFrom());
+        var saved = carManagementService.registerCar(new RegisterCarCommand(
+                request.carTypeId(),
+                request.numberPlate(),
+                request.availableFrom()
+        ));
         return new CarResponse(saved.id(), saved.carTypeId(), saved.numberPlate(), saved.availableFrom());
     }
 

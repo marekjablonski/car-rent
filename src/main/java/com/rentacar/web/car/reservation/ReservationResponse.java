@@ -1,6 +1,6 @@
 package com.rentacar.web.car.reservation;
 
-import com.rentacar.model.reservation.ReservationStatus;
+import com.rentacar.model.ReservationStatus;
 
 import java.time.Instant;
 import java.time.LocalDate;

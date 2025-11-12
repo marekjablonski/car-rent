@@ -1,4 +1,4 @@
-package com.rentacar.model.common;
+package com.rentacar.model;
 
 import java.time.LocalDate;
 import java.util.Objects;

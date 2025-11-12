@@ -1,12 +1,12 @@
 package com.rentacar;
 
-import com.rentacar.model.car.CarCategory;
-import com.rentacar.model.car.CarType;
+import com.rentacar.model.CarCategory;
 import com.rentacar.service.car.management.CarAvailabilityService;
 import com.rentacar.service.car.management.CarManagementService;
+import com.rentacar.service.car.management.dto.RegisterCarCommand;
+import com.rentacar.service.car.management.dto.RegisterCarTypeCommand;
 import com.rentacar.service.car.reservation.CreateReservationCommand;
 import com.rentacar.service.car.reservation.ReservationService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,11 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.math.BigDecimal;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,14 +48,14 @@ class CarRentApplicationTests {
     @BeforeEach
     void setUpFleet() {
         carTypeId = UUID.randomUUID();
-        carManagementService.registerCarType(new CarType(
+        carManagementService.registerCarType(new RegisterCarTypeCommand(
                 carTypeId,
                 CarCategory.SEDAN,
                 "https://example.com/sedan.png",
                 BigDecimal.valueOf(100),
                 5
         ));
-        carManagementService.registerCar(carTypeId, "ABC123", currentDate());
+        carManagementService.registerCar(new RegisterCarCommand(carTypeId, "ABC123", currentDate()));
     }
 
     @Test

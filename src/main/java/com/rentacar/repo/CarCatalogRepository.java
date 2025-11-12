@@ -1,10 +1,6 @@
 package com.rentacar.repo;
 
-import com.rentacar.model.car.CarCategory;
-import com.rentacar.model.car.CarType;
-import com.rentacar.model.car.Car;
-import com.rentacar.model.reservation.Reservation;
-import com.rentacar.model.common.DateRange;
+import com.rentacar.model.*;
 
 import java.time.Instant;
 import java.time.LocalDate;

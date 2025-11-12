@@ -1,4 +1,4 @@
-package com.rentacar.model.reservation;
+package com.rentacar.model;
 
 public enum ReservationStatus {
     PENDING_PAYMENT,

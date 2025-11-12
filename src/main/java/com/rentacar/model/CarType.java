@@ -1,7 +1,4 @@
-package com.rentacar.model.car;
-
-import com.rentacar.model.common.DateRange;
-import com.rentacar.model.reservation.Reservation;
+package com.rentacar.model;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -12,12 +9,7 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Accessors(fluent = true)

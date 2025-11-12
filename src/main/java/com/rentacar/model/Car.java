@@ -1,4 +1,4 @@
-package com.rentacar.model.car;
+package com.rentacar.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
