@@ -1,6 +1,6 @@
 package com.rentacar.model;
 
-import lombok.AccessLevel;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -13,21 +13,33 @@ import java.util.*;
 
 @Getter
 @Accessors(fluent = true)
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
+@Table(name = "car_types")
 public class CarType {
 
     @EqualsAndHashCode.Include
-    @ToString.Include
-    private final UUID id;
-    private final CarCategory category;
-    private final String pictureUrl;
-    private final BigDecimal pricePerDay;
-    private final int seats;
-    @Getter(AccessLevel.NONE)
-    private final Set<Car> cars = new HashSet<>();
-    @Getter(AccessLevel.NONE)
-    private final Set<Reservation> reservations = new HashSet<>();
+    @Id
+    private UUID id;
+
+    private CarCategory category;
+
+    private String pictureUrl;
+
+    private BigDecimal pricePerDay;
+
+    private int seats;
+
+    @OneToMany(mappedBy = "car_types", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Car> cars = new HashSet<>();
+
+    @OneToMany(mappedBy = "car_types", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Reservation> reservations = new HashSet<>();
+
+    protected CarType() {
+        // for JPA
+    }
 
     public CarType(UUID id,
                    CarCategory category,

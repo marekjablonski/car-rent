@@ -1,5 +1,6 @@
 package com.rentacar.model;
 
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -14,13 +15,17 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 public class Reservation {
-
+    @Id
     @EqualsAndHashCode.Include
     @ToString.Include
     private final UUID id;
     private final UUID userId;
-    private final UUID carTypeId;
+    @ManyToOne
+    @JoinColumn(name = "car_type_id")
+    private final CarType carType;
+    @Embedded
     private final DateRange dateRange;
     private final Instant createdAt;
     private final Instant lockExpiresAt;
@@ -30,14 +35,14 @@ public class Reservation {
 
     public Reservation(UUID id,
                        UUID userId,
-                       UUID carTypeId,
+                       CarType carType,
                        LocalDate dateFrom,
                        LocalDate dateTo,
                        Instant createdAt,
                        Instant lockExpiresAt) {
         this.id = Objects.requireNonNull(id, "id is required");
         this.userId = Objects.requireNonNull(userId, "userId is required");
-        this.carTypeId = Objects.requireNonNull(carTypeId, "carTypeId is required");
+        this.carType = Objects.requireNonNull(carType, "carTypeId is required");
         this.dateRange = new DateRange(dateFrom, dateTo);
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt is required");
         this.lockExpiresAt = Objects.requireNonNull(lockExpiresAt, "lockExpiresAt is required");
