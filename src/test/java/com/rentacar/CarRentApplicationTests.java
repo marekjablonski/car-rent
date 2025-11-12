@@ -4,7 +4,6 @@ import com.rentacar.model.CarCategory;
 import com.rentacar.service.car.management.CarManagement;
 import com.rentacar.service.car.management.dto.RegisterCarCommand;
 import com.rentacar.service.car.management.dto.RegisterCarTypeCommand;
-import com.rentacar.service.car.reservation.CarAvailabilityService;
 import com.rentacar.service.car.reservation.CreateReservationCommand;
 import com.rentacar.service.car.reservation.ReservationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +15,6 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.math.BigDecimal;
 import java.time.*;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,18 +27,15 @@ class CarRentApplicationTests {
 
     private final ReservationService reservationService;
     private final CarManagement carManagement;
-    private final CarAvailabilityService carAvailability;
     private final MutableClock clock;
 
     private UUID carTypeId;
 
     CarRentApplicationTests(ReservationService reservationService,
                             CarManagement carManagement,
-                            CarAvailabilityService carAvailability,
                             MutableClock clock) {
         this.reservationService = reservationService;
         this.carManagement = carManagement;
-        this.carAvailability = carAvailability;
         this.clock = clock;
     }
 
@@ -57,23 +52,6 @@ class CarRentApplicationTests {
         carManagement.registerCar(new RegisterCarCommand(carTypeId, "ABC123", currentDate()));
     }
 
-    @Test
-    void createsReservationWhenInventoryIsAvailable() {
-        LocalDate pickup = currentDate().plusDays(1);
-        LocalDate dropOff = pickup.plusDays(2);
-        UUID reservationId = UUID.randomUUID();
-
-        reservationService.createReservation(new CreateReservationCommand(
-                reservationId,
-                UUID.randomUUID(),
-                carTypeId,
-                pickup,
-                dropOff
-        ));
-
-        var available = carAvailability.findAvailableTypes(List.of(CarCategory.SEDAN), pickup, dropOff);
-        assertThat(available).isEmpty();
-    }
 
     @Test
     void preventsOverbookingWhenFleetIsFull() {

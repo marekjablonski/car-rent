@@ -1,9 +1,6 @@
 package com.rentacar.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -18,21 +15,37 @@ import java.util.UUID;
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
+@Table(name = "cars")
 public class Car {
+
     @Id
     @EqualsAndHashCode.Include
     @ToString.Include
-    private final UUID id;
-    @ManyToOne
-    @JoinColumn(name = "car_type_id")
-    private final CarType carType;
-    private final String numberPlate;
-    private final LocalDate availableFrom;
+    @Column(name = "id", nullable = false, updatable = false)
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_type_id", nullable = false)
+    private CarType carType;
+
+    @Column(name = "number_plate", nullable = false, unique = true, length = 32)
+    private String numberPlate;
+
+    @Column(name = "available_from", nullable = false)
+    private LocalDate availableFrom;
+
+    protected Car() {
+        // for JPA
+    }
 
     public Car(UUID id, CarType carType, String numberPlate, LocalDate availableFrom) {
         this.id = Objects.requireNonNull(id, "id is required");
-        this.carType = Objects.requireNonNull(carType, "carTypeId is required");
+        this.carType = Objects.requireNonNull(carType, "carType is required");
         this.numberPlate = Objects.requireNonNull(numberPlate, "numberPlate is required");
         this.availableFrom = Objects.requireNonNull(availableFrom, "availableFrom is required");
+    }
+
+    void assignCarType(CarType carType) {
+        this.carType = carType;
     }
 }

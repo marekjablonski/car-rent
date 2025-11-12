@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
 
-  juggling-api-pgsql:
+  car-rent-api-pgsql:
     image: postgres:16.1
     environment:
       POSTGRES_DB: car_rent

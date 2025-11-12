@@ -1,22 +1,44 @@
 package com.rentacar.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
 /**
  * Inclusive date range helper used to reason about reservations.
  */
-public record DateRange(LocalDate start, LocalDate end) {
+@Embeddable
+public class DateRange {
 
-    public DateRange {
-        Objects.requireNonNull(start, "start date is required");
-        Objects.requireNonNull(end, "end date is required");
-        if (end.isBefore(start)) {
+    @Column(name = "date_from", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "date_to", nullable = false)
+    private LocalDate endDate;
+
+    protected DateRange() {
+        // for JPA
+    }
+
+    public DateRange(LocalDate start, LocalDate end) {
+        this.startDate = Objects.requireNonNull(start, "start date is required");
+        this.endDate = Objects.requireNonNull(end, "end date is required");
+        if (this.endDate.isBefore(this.startDate)) {
             throw new IllegalArgumentException("End date must be on or after start date");
         }
     }
 
+    public LocalDate start() {
+        return startDate;
+    }
+
+    public LocalDate end() {
+        return endDate;
+    }
+
     public boolean overlaps(DateRange other) {
-        return !(end.isBefore(other.start) || start.isAfter(other.end));
+        return !(endDate.isBefore(other.startDate) || startDate.isAfter(other.endDate));
     }
 }

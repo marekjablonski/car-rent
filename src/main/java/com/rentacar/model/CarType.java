@@ -21,21 +21,26 @@ public class CarType {
 
     @EqualsAndHashCode.Include
     @Id
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false, unique = true)
     private CarCategory category;
 
+    @Column(name = "picture_url", nullable = false)
     private String pictureUrl;
 
+    @Column(name = "price_per_day", nullable = false)
     private BigDecimal pricePerDay;
 
+    @Column(name = "seats", nullable = false)
     private int seats;
 
-    @OneToMany(mappedBy = "car_types", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "carType", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Car> cars = new HashSet<>();
 
-    @OneToMany(mappedBy = "car_types", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "carType", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Reservation> reservations = new HashSet<>();
 
     protected CarType() {
@@ -60,16 +65,21 @@ public class CarType {
         this.seats = seats;
     }
 
+    public Set<Car> cars() {
+        return Collections.unmodifiableSet(cars);
+    }
 
     public Set<Reservation> reservations() {
         return Collections.unmodifiableSet(reservations);
     }
 
     public void addCar(Car car) {
+        car.assignCarType(this);
         cars.add(car);
     }
 
     public void addReservation(Reservation reservation) {
+        reservation.assignCarType(this);
         reservations.add(reservation);
     }
 

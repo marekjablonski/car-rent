@@ -36,8 +36,8 @@ class CarManagementImpl implements CarManagement {
 
     @Override
     public CarDto registerCar(RegisterCarCommand command) {
-
-        CarType type = carManagementRepository.findCarType(command.carTypeId()).get();
+        CarType type = carManagementRepository.findCarType(command.carTypeId())
+                .orElseThrow(() -> new IllegalArgumentException("Unknown car type: " + command.carTypeId()));
         Car car = new Car(
                 UUID.randomUUID(),
                 type,
@@ -45,12 +45,13 @@ class CarManagementImpl implements CarManagement {
                 command.availableFrom()
         );
         type.addCar(car);
+        Car saved = carManagementRepository.saveCar(car);
 
         return new CarDto(
-                car.id(),
-                car.carType().id(),
-                car.numberPlate(),
-                car.availableFrom()
+                saved.id(),
+                saved.carType().id(),
+                saved.numberPlate(),
+                saved.availableFrom()
         );
     }
 

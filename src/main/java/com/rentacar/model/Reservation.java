@@ -16,22 +16,44 @@ import java.util.UUID;
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
+@Table(name = "reservations")
 public class Reservation {
+
     @Id
     @EqualsAndHashCode.Include
     @ToString.Include
-    private final UUID id;
-    private final UUID userId;
-    @ManyToOne
-    @JoinColumn(name = "car_type_id")
-    private final CarType carType;
+    @Column(name = "id", nullable = false, updatable = false)
+    private UUID id;
+
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_type_id", nullable = false)
+    private CarType carType;
+
     @Embedded
-    private final DateRange dateRange;
-    private final Instant createdAt;
-    private final Instant lockExpiresAt;
+    private DateRange dateRange;
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "lock_expires_at", nullable = false)
+    private Instant lockExpiresAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private ReservationStatus status;
+
+    @Column(name = "payment_id")
     private String paymentId;
+
+    @Column(name = "confirmed_at")
     private Instant confirmedAt;
+
+    protected Reservation() {
+        // for JPA
+    }
 
     public Reservation(UUID id,
                        UUID userId,
@@ -42,11 +64,15 @@ public class Reservation {
                        Instant lockExpiresAt) {
         this.id = Objects.requireNonNull(id, "id is required");
         this.userId = Objects.requireNonNull(userId, "userId is required");
-        this.carType = Objects.requireNonNull(carType, "carTypeId is required");
+        this.carType = Objects.requireNonNull(carType, "carType is required");
         this.dateRange = new DateRange(dateFrom, dateTo);
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt is required");
         this.lockExpiresAt = Objects.requireNonNull(lockExpiresAt, "lockExpiresAt is required");
         this.status = ReservationStatus.PENDING_PAYMENT;
+    }
+
+    void assignCarType(CarType carType) {
+        this.carType = carType;
     }
 
     public boolean overlaps(DateRange range) {
